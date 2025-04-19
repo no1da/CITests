@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   selenoid:
     image: aerokube/selenoid:latest-release
@@ -25,7 +26,8 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - selenoid
+      selenoid:
+        condition: service_healthy
     environment:
       - JAVA_OPTS=-Dwebdriver.remote.url=http://selenoid:4444/wd/hub
     volumes:
