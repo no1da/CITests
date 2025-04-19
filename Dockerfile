@@ -6,7 +6,8 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 COPY src ./src
-COPY wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
 
-CMD ["/bin/bash", "-c", "/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn test"]
+# Allure output сохранится в volume
+VOLUME /app/allure-results
+
+CMD ["mvn", "clean", "test"]
