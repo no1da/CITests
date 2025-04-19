@@ -1,0 +1,34 @@
+services:
+  selenoid:
+    container_name: selenoid
+    image: aerokube/selenoid:latest-release
+    ports:
+      - "4444:4444"
+    volumes:
+      - ./browsers.json:/etc/selenoid/browsers.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - "-limit"
+      - "4"
+      - "-conf"
+      - "/etc/selenoid/browsers.json"
+      - "-listen"
+      - "0.0.0.0:4444"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  citests:
+    container_name: citests
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - selenoid
+    environment:
+      - JAVA_OPTS=-Dwebdriver.remote.url=http://selenoid:4444/wd/hub
+    volumes:
+      - ./allure-results:/app/allure-results
+      - ./.m2:/root/.m2
